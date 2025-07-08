@@ -18,32 +18,33 @@ def dibujar_boton(pantalla, rect, color, texto):
     texto_rect = texto_render.get_rect(center=(rect[0] + rect[2] // 2, rect[1] + rect[3] // 2))
     pantalla.blit(texto_render, texto_rect)
 
-def dibujar_tablero(pantalla, posicion):  
-    '''
-    Dibuja un tablero de 30 casillas numeradas  en 2 filas de 15 casillas cada una.
-    También muestra la posición actual del jugador con un círculo rojo.
-
-    Parámetros:
-    - pantalla: superficie de Pygame donde se dibujará el tablero.
-    - posicion: número de casilla actual del jugador (de 0 a 29). Se representa con un círculo rojo.
-    '''                                              
-    ancho_casilla = 20  
-    alto_casilla = 20   
+def dibujar_tablero(pantalla, posicion):
+    ancho_casilla = 20
+    alto_casilla = 20
     x_inicial = 10
-    y_inicial = 10  
+    y_inicial = 10
+
+    CANT_FILAS = 2
+    CANT_COLUMNAS = 15
 
     fuente = pygame.font.SysFont(None, 18)
-    for i in range(30):
-        fila = i // 15
-        col = i % 15
-        x = x_inicial + col * (ancho_casilla + 2)
-        y = y_inicial + fila * (alto_casilla + 2)  
-        color = (200, 200, 200) 
-        pygame.draw.rect(pantalla, color, (x, y, ancho_casilla, alto_casilla))
-        num_render = fuente.render(str(i + 1), True, (0, 0, 0))
-        pantalla.blit(num_render, (x + 3, y + 3))  
-        if i == posicion:
-            pygame.draw.circle(pantalla, (255, 0, 0), (x + ancho_casilla // 2, y + alto_casilla // 2), 8)
+    numero = 1
+    for fila in range(CANT_FILAS):
+        for col in range(CANT_COLUMNAS):
+            x = x_inicial + col * (ancho_casilla + 2)
+            y = y_inicial + fila * (alto_casilla + 2)
+
+            color = (200, 200, 200)
+            pygame.draw.rect(pantalla, color, (x, y, ancho_casilla, alto_casilla))
+
+            num_render = fuente.render(str(numero), True, (0, 0, 0))
+            pantalla.blit(num_render, (x + 3, y + 3))
+
+            if numero - 1 == posicion:
+                pygame.draw.circle(pantalla, (255, 0, 0), (x + ancho_casilla // 2, y + alto_casilla // 2), 8)
+
+            numero += 1
+
 
 
 def mostrar_pregunta_pygame(pantalla, pregunta, fuente):
@@ -73,9 +74,10 @@ def mostrar_pregunta_pygame(pantalla, pregunta, fuente):
     lineas = []
     palabras = []
     palabra = ""
+    
 
-    i = 0
-    while i < len(texto):
+
+    for i in range (0,len(texto)):
         c = texto[i]
         if c != " ":
             palabra += c
@@ -83,14 +85,16 @@ def mostrar_pregunta_pygame(pantalla, pregunta, fuente):
             if palabra != "":
                 palabras.append(palabra)
                 palabra = ""
-        i += 1
+     
   
     if palabra != "":
         palabras.append(palabra)
 
     linea_actual = ""
+    posible_linea = ""
+
     for palabra_actual in palabras:
-        if linea_actual == "":
+        if linea_actual == "":  
             posible_linea = palabra_actual
         else:
             posible_linea = linea_actual + " " + palabra_actual
@@ -101,7 +105,7 @@ def mostrar_pregunta_pygame(pantalla, pregunta, fuente):
         else:
             linea_actual = posible_linea
 
-    if linea_actual != "":
+    if linea_actual != "":      
         lineas.append(linea_actual)
 
  
@@ -121,13 +125,13 @@ def mostrar_pregunta_pygame(pantalla, pregunta, fuente):
         pygame.draw.rect(pantalla, (200, 200, 200), rect)
         texto_render = fuente.render(opciones[i] + ") " + textos[i], True, (0, 0, 0))
         pantalla.blit(texto_render, (rect.x + 10, rect.y + 10))
-        rect = pygame.Rect(50, y + i * 50, 500, 40)
-        pygame.draw.rect(pantalla, (200, 200, 200), rect)
-        texto_render = fuente.render(opciones[i] + ") " + textos[i], True, (0, 0, 0))
-        pantalla.blit(texto_render, (rect.x + 10, rect.y + 10))
         rects.append((opciones[i], rect))
 
+    
     return rects
+
+
+    
 
 
 def mostrar_texto_simple(pantalla, texto, fuente, color, x, y):
@@ -194,8 +198,8 @@ def leer_puntajes():
         nombre = ""
         puntaje = ""
         bandera = False
-        i = 0
-        while i < len(linea):
+        
+        for i in range (0,len(linea)):
             if not bandera:
                 if linea[i] != ",":
                     nombre += linea[i]
@@ -204,8 +208,8 @@ def leer_puntajes():
             else:
                 if linea[i] != "\n":
                     puntaje += linea[i]
-            i += 1
-        datos.append([nombre, int(puntaje)])
+            
+        datos.append([nombre, str(puntaje)])
     archivo.close()
     return datos 
 
@@ -219,7 +223,9 @@ def ordenar_puntajes_asc(datos):
     for i in range(len(datos) - 1):
         for j in range(i + 1, len(datos)):
             if datos[i][1] > datos[j][1]:
-                datos[i], datos[j] = datos[j], datos[i]
+               aux = datos[i]
+               datos[i] = datos[j]
+               datos[j] = aux
     return datos
 
 def obtener_top_5(datos_ordenados):
@@ -231,10 +237,9 @@ def obtener_top_5(datos_ordenados):
 
     """
     top_5 = []
-    i = 0
-    while i < len(datos_ordenados) and i < 5:
+    for i in range(0,5):
         top_5.append(datos_ordenados[i])
-        i += 1
+
     return top_5
 
 def finalizar_juego(estado, funcion_guardar):
@@ -285,7 +290,3 @@ def obtener_siguiente_pregunta(estado, preguntas, funcion_buscar):
             estado['tiempo_inicio_pregunta'] = pygame.time.get_ticks()
             return
  
-
-
-
-
